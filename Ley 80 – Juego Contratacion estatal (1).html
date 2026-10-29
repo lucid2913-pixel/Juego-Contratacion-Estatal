@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ley 80 – Juego Contratacion estatal</title>
+<style>
+:root{--bg:#1a1a1a;--fg:#f5f5f5;--card:#242424;--line:#3a3a3a;--ok:#2ecc71;--bad:#ff3b4e;--gold:#f5c542;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{margin:0;background:radial-gradient(900px 500px at 50% -10%,#2b2618,var(--bg) 60%) fixed;color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:20px;line-height:1.6}
+body.fok{box-shadow:inset 0 0 0 4px var(--ok)}body.fbad{box-shadow:inset 0 0 0 4px var(--bad)}
+main{max-width:780px;margin:0 auto;padding:22px 18px 70px}
+h1{font-size:2.1rem;line-height:1.2;margin:.3em 0}
+.sub{opacity:.8}
+button{font:inherit;color:var(--fg);cursor:pointer}
+.mode{display:block;width:100%;text-align:left;margin:16px 0;padding:24px;border-radius:18px;background:linear-gradient(135deg,#2c2c2c,#202020);border:2px solid var(--line);transition:.15s}
+.mode:hover:not(:disabled){border-color:var(--gold);transform:translateY(-2px)}
+.mode:disabled{opacity:.45;cursor:not-allowed}
+.mode b{display:block;font-size:1.4rem;color:var(--gold)}
+.mode span{font-size:.9rem;opacity:.8}
+#bar{position:sticky;top:env(safe-area-inset-top,0px);height:14px;background:var(--line);border-radius:8px;overflow:hidden;z-index:5}
+#fill{height:100%;width:0;background:linear-gradient(90deg,#ff7a18,var(--gold),var(--ok));box-shadow:0 0 14px #f5c54288;transition:width .5s}
+#meta{display:flex;justify-content:space-between;font-size:.8rem;opacity:.85;margin:8px 0 18px}
+.q{font-size:1.2rem;font-weight:600;margin-bottom:20px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px;transition:.15s}
+.opt:hover:not(:disabled){border-color:var(--gold)}
+.opt:active:not(:disabled){transform:scale(.98)}
+.opt:disabled{cursor:default;color:var(--fg)}
+.opt.ok{background:var(--ok);border-color:var(--ok);color:#052711;font-weight:700}
+.opt.bad{background:var(--bad);border-color:var(--bad);color:#fff;font-weight:700;animation:shake .45s}
+.opt.dim{opacity:.4}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-11px)}40%{transform:translateX(11px)}60%{transform:translateX(-7px)}80%{transform:translateX(7px)}}
+.card{background:#262626;border-left:6px solid var(--gold);border-radius:14px;padding:18px 20px;margin-top:20px;animation:up .3s}
+.card h3{margin:0 0 6px;color:var(--gold);font-size:1.05rem}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.big{display:block;width:100%;margin-top:18px;padding:18px;font-size:1.15rem;font-weight:800;background:var(--gold);color:#1a1a1a;border:0;border-radius:14px}
+.big.alt{background:transparent;color:var(--fg);border:2px solid var(--line)}
+.big:active{transform:scale(.98)}
+.score{font-size:4.2rem;font-weight:800;color:var(--gold)}
+.msg{font-weight:700;margin-bottom:14px;padding:10px 14px;border-radius:10px;animation:up .3s}.msg.ok{background:#12301d;color:#7dffa8}.msg.bad{background:#3a1d22;color:#ff9aa6}#rank{font-size:2rem;font-weight:800;margin:10px 0}#stats{opacity:.85;margin-bottom:6px}#streak{color:#ff9a3c;font-weight:700}
+#top{display:flex;justify-content:space-between;margin-bottom:10px}#top button{background:transparent;border:2px solid var(--line);border-radius:10px;padding:6px 14px;font-size:.8rem}#top button:hover{border-color:var(--gold)}.rs{background:none;border:0;color:var(--gold);font-size:.8rem;text-decoration:underline;margin:-6px 0 10px}
+.in{animation:slide .35s ease-out}@keyframes slide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+#pts{display:inline-block}.pp{animation:pp .4s}@keyframes pp{50%{transform:scale(1.4);color:var(--gold)}}
+.pc{position:fixed;top:45vh;font-size:1.7rem;pointer-events:none;z-index:50;animation:fly 1s ease-out forwards}@keyframes fly{from{opacity:1;transform:translate(0,0) scale(1)}to{opacity:0;transform:translate(var(--dx),-200px) rotate(240deg) scale(.5)}}
+details{margin-top:12px}summary{cursor:pointer;color:var(--gold)}details p{font-size:.85rem;border-top:1px solid var(--line);padding-top:10px}
+[hidden]{display:none!important}
+</style></head><body><main>
+<section id="home">
+<h1>⚖️ Contratación Estatal<br>Ley 80</h1>
+<p class="sub">Elige tu modo. Una pregunta a la vez, sin repeticiones.</p>
+<button class="mode" id="mT"><b>📘 Modo Teórico</b><span id="nT"></span></button><button class="rs" id="rT" hidden>↺ Empezar de cero</button>
+<button class="mode" id="mC"><b>🔪 Modo Casuístico</b><span id="nC"></span></button><button class="rs" id="rC" hidden>↺ Empezar de cero</button>
+</section>
+<section id="game" hidden>
+<div id="top"><button id="back">← Menú</button><button id="snd">🔊</button></div><div id="bar"><div id="fill"></div></div>
+<div id="meta"><span id="count"></span><span id="streak"></span><span id="pts"></span></div>
+<div class="q" id="q"></div><div id="opts"></div>
+<div class="card" id="fb" hidden><div id="msg"></div><h3>🎓 Explicación del Profe</h3><div id="exp"></div><button class="big" id="next">Continuar</button></div>
+</section>
+<section id="end" hidden>
+<h1>Resultados</h1><div id="rank"></div><div class="score" id="final"></div><div id="stats"></div><p id="verdict"></p><div id="improve"></div>
+<button class="big" id="redo" hidden>🎯 Repasar solo mis errores</button><button class="big" id="again">Repetir este modo</button><button class="big alt" id="menu">Volver al menú</button>
+</section></main>
+<script>
+const mk=a=>a.map(([pregunta,correcta,incorrectas,explicacion])=>({pregunta,correcta,incorrectas,explicacion}));
+// ARRAY 1: TEÓRICO (40)
+const TEORICO=mk([
+[`¿Sobre qué recae directamente el Principio de Anualidad en la contratación estatal?`,`Sobre el presupuesto (programación y ejecución en 1 año fiscal).`,[`Sobre el gasto propiamente dicho.`,`Sobre la vigencia de las pólizas.`,`Sobre el tiempo máximo de ejecución de cualquier obra.`],`El principio de anualidad exige que el presupuesto se apruebe y ejecute en un año. Recae sobre el presupuesto, no sobre el gasto.`],
+[`¿En qué momento se perfecciona un contrato estatal según el art. 41 de la Ley 80?`,`Cuando hay acuerdo sobre el objeto, la contraprestación y se eleva a escrito.`,[`Cuando se aprueban las garantías.`,`Cuando se suscribe el acta de inicio.`,`Cuando se publica en el SECOP 2.`],`El perfeccionamiento exige solemnidad: acuerdo de voluntades sobre objeto y precio, elevado a escrito formalmente.`],
+[`¿Cuál es la diferencia fundamental entre un requisito habilitante y un factor de evaluación?`,`El habilitante mide aptitud (cumple/no cumple); el de evaluación da puntaje.`,[`El habilitante da el 50% del puntaje; el de evaluación el resto.`,`El habilitante aplica en etapa contractual; el de evaluación en precontractual.`,`Ambos otorgan puntos en la Licitación.`],`Los habilitantes solo te dejan participar. No suman puntos. Los factores de evaluación deciden quién gana.`],
+[`¿A quién le pertenece el dinero entregado como “Anticipo”?`,`Al Estado. El contratista solo lo administra y su límite es el 20%.`,[`Al Contratista, desde que entra a su cuenta.`,`Al Supervisor, quien lo custodia.`,`Al interventor para pagar nómina.`],`El anticipo es dinero público adelantado. El “pago anticipado”, en cambio, sí es plata del contratista.`],
+[`¿Qué figura jurídica incorpora obligatoriamente la “cláusula de reversión”?`,`El Contrato de Concesión.`,[`El Contrato de Consultoría.`,`El Contrato de Obra.`,`El Encargo Fiduciario.`],`En la concesión, cumplido el plazo, los bienes afectos al servicio retornan al dominio del Estado, es de su esencia.`],
+[`¿Cuál es el tope legal máximo por el cual se puede “adicionar” el valor de un contrato estatal?`,`Hasta el 50% de su valor inicial.`,[`Hasta el 20% de su valor inicial.`,`Hasta el 100% por urgencia.`,`No hay límite si hay planeación.`],`Los contratos estatales solo pueden adicionarse en máximo un 50% de su valor inicial.`],
+[`¿Cuál es el objeto del Registro Único de Proponentes (RUP)?`,`Acreditar la capacidad jurídica, financiera, organizacional y experiencia.`,[`Reemplazar los estudios previos de la entidad.`,`Sustituir el SECOP 2 para Mínima Cuantía.`,`Otorgar puntaje adicional a las Mipymes.`],`El RUP es administrado por Cámaras de Comercio y consolida los requisitos habilitantes.`],
+[`¿Qué diferencia hay entre la liquidación y el cierre del expediente?`,`La liquidación cruza cuentas; el cierre es una constancia administrativa posterior al vencimiento de garantías.`,[`Son exactamente lo mismo.`,`La liquidación es precontractual, el cierre postcontractual.`,`El cierre cruza cuentas, la liquidación archiva.`],`La liquidación define saldos al terminar. El cierre acredita años después que las garantías ya vencieron.`],
+[`¿Con quién se celebran los Convenios Solidarios (contratación directa)?`,`Con organizaciones comunales (JAC, Asocomunales).`,[`Con las Juntas Administradoras Locales (JAL).`,`Con Entidades Sin Ánimo de Lucro (ESAL).`,`Con Cámaras de Comercio.`],`Los convenios solidarios se hacen con organismos de acción comunal (JAC). No confundir con la JAL.`],
+[`¿En qué modalidad de selección se utiliza la “Subasta Inversa”?`,`Selección Abreviada.`,[`Licitación Pública.`,`Concurso de Méritos.`,`Contratación Directa.`],`La subasta inversa es uno de los procedimientos de la Selección Abreviada (bienes de características uniformes).`],
+[`¿Cuál es la diferencia principal entre Encargo Fiduciario y Fiducia Pública?`,`La Fiducia Pública crea un patrimonio autónomo; el encargo no.`,[`El encargo es directo; la fiducia por licitación.`,`La fiducia maneja anticipos; el encargo no.`,`No hay diferencia legal.`],`Ambas entregan dinero a una fiduciaria, pero solo la fiducia pública constituye un patrimonio autónomo.`],
+[`¿Qué persigue la Ley de Garantías (Ley 996 de 2005)?`,`Asegurar transparencia impidiendo que se usen contratos para favorecer campañas electorales.`,[`Garantizar el anticipo del contratista.`,`Extender pólizas de estabilidad.`,`Prohibir totalmente la contratación.`],`Busca igualdad electoral restringiendo ciertas actuaciones en época de elecciones.`],
+[`¿Cómo se define el Ius Variandi en contratación estatal?`,`Potestad exclusiva de la administración para hacer modificaciones unilaterales y evitar parálisis del servicio.`,[`Derecho del contratista a demandar en In Rem Verso.`,`Derecho de ESAL a no competir.`,`Obligación de liquidar judicialmente.`],`Es una cláusula excepcional que permite a la entidad modificar unilateralmente el contrato.`],
+[`¿Qué es el “K residual” o capacidad residual?`,`La capacidad disponible para asumir un nuevo contrato de obra considerando compromisos vigentes.`,[`El remanente del anticipo no amortizado.`,`El puntaje adicional a consorcios.`,`El saldo a favor del Estado.`],`K residual aplica para contratos de obra, midiendo si el contratista no está sobrecargado.`],
+[`¿Cuál es el propósito del Concurso de Méritos?`,`Contratar consultoría y actividades intelectuales basadas en experiencia.`,[`Comprar bienes de características uniformes.`,`Contratar grandes infraestructuras.`,`Atender emergencias manifiestas.`],`Es para diagnósticos, interventorías y asesorías donde prima el intelecto.`],
+[`¿Qué etapa contractual materializa los estudios previos y el análisis del sector?`,`La Etapa Precontractual.`,[`La Etapa Contractual.`,`La Etapa Postcontractual.`,`La Etapa de Liquidación.`],`La etapa precontractual es la fase preparatoria y de planeación de la necesidad.`],
+[`¿Cuáles son los tres indicadores clave que evalúan la “capacidad financiera”?`,`Índice de liquidez, índice de endeudamiento y cobertura de intereses.`,[`K residual, K organizacional y RUP.`,`Patrimonio autónomo, experiencia y multas.`,`Anticipo, pago anticipado y garantías.`],`Estos tres indicadores demuestran la solidez económica del proponente.`],
+[`¿Cuál es la diferencia entre el precio “Global” y el “Unitario”?`,`El global se conoce desde la firma; el unitario solo se conoce al final según lo ejecutado.`,[`El global incluye impuestos, el unitario no.`,`El unitario solo aplica en consultoría.`,`El global es exclusivo de contratación directa.`],`El precio global es fijo, el unitario se calcula multiplicando las cantidades reales ejecutadas al final.`],
+[`¿En qué tipología contractual está expresamente prohibido entregar anticipos?`,`En los contratos de prestación de servicios profesionales.`,[`En los contratos de obra pública.`,`En los contratos de concesión.`,`En los convenios solidarios.`],`La ley prohíbe financiar al contratista de prestación de servicios con dineros del Estado (anticipo).`],
+[`¿Qué ocurre si un grupo de Entidades Sin Ánimo de Lucro (ESAL) quiere celebrar un convenio pero ninguna aporta el 30%?`,`Se debe realizar un proceso competitivo entre ellas.`,[`Se contrata directamente a la más antigua.`,`Se declara desierto el proceso.`,`Se obliga a la JAC a asumir el contrato.`],`Sin el aporte mínimo del 30%, se pierde la causal directa y se debe abrir a competencia plural.`],
+[`¿Para qué tipología de contratos NO es obligatoria rutinariamente la liquidación?`,`Prestación de servicios profesionales y de apoyo a la gestión.`,[`Contratos de obra pública.`,`Contratos de tracto sucesivo.`,`Contratos de concesión.`],`Aunque se puede hacer, la ley dice que en prestación de servicios profesionales no es un trámite obligatorio.`],
+[`¿Quién ejerce estrictamente la función de “Supervisión” (no interventoría)?`,`Un servidor público de la entidad estatal (interno).`,[`Un consultor externo contratado.`,`El representante legal del consorcio.`,`La Contraloría General de la República.`],`La supervisión es interna (servidor de planta). La interventoría es externa (tercero contratado).`],
+[`¿Qué es una Promesa de Sociedad Futura en contratación?`,`Varios proponentes se unen comprometiéndose a constituirse legalmente como sociedad si ganan el proceso.`,[`Una ESAL que busca convertirse en empresa comercial.`,`Un consorcio que se transforma en unión temporal.`,`Un patrimonio autónomo fiduciario transitorio.`],`Tienen aptitud legal; prometen formalizarse solo si resultan adjudicatarios.`],
+[`¿Cuáles son los riesgos directos en la contratación?`,`Aquellos desprendidos del propio contrato (ej. calidad) y se mitigan con garantías.`,[`Los fenómenos de la naturaleza.`,`Las decisiones macroeconómicas.`,`El hecho del príncipe.`],`Son riesgos internos y propios de la ejecución, a diferencia de los exógenos.`],
+[`¿Qué actuaciones principales conforman la Etapa Postcontractual?`,`La liquidación (si procede) y el cierre del expediente.`,[`El perfeccionamiento y el acta de inicio.`,`Los estudios previos y la adjudicación.`,`El pago del anticipo y la ejecución.`],`Es todo lo que ocurre después de terminada la ejecución material de las obligaciones.`],
+[`¿Qué modalidad de selección es altamente técnica y la regla general por excelencia?`,`Licitación Pública.`,[`Selección Abreviada.`,`Mínima Cuantía.`,`Concurso de Méritos.`],`Es el proceso competitivo más riguroso, usado para obra y mayor cuantía.`],
+[`¿Qué contiene el “pliego de condiciones”?`,`La lista de requisitos, factores de evaluación y reglas de juego del proceso.`,[`Solo el análisis de riesgos y garantías.`,`El informe final de la liquidación unilateral.`,`La designación del supervisor.`],`Es la “ley del contrato” antes de firmarse; establece cómo se evaluará y qué se exige.`],
+[`¿A qué principio responde la regla de “Selección Objetiva”?`,`Al principio de transparencia y escogencia de la oferta más favorable.`,[`Al principio de anualidad presupuestal.`,`A la teoría de la imprevisión.`,`A la cláusula de reversión.`],`Evita la subjetividad, garantizando igualdad de trato a todos los proponentes.`],
+[`¿Qué tipo de acto se expide al realizar la Liquidación Unilateral?`,`Un acto administrativo dictado por la entidad.`,[`Una sentencia judicial de controversias.`,`Un acta de mutuo acuerdo ante notario.`,`Un laudo arbitral de las partes.`],`Cuando el contratista no asiste o no hay acuerdo, la entidad impone la liquidación mediante un acto administrativo.`],
+[`¿Cuáles son las partes indirectas de la contratación estatal?`,`Los órganos de control (Ministerio Público, Veedurías).`,[`El contratista y el ordenador del gasto.`,`El Consorcio y la Unión Temporal.`,`Las Entidades Sin Ánimo de Lucro.`],`Las directas son la administración y el contratista. Las indirectas son quienes vigilan.`],
+[`Conceptualmente, ¿qué es un “riesgo” en materia de contratación estatal?`,`Un hecho futuro e incierto que puede afectar la ejecución o la economía del contrato.`,[`Un hecho presente y comprobado de daño antijurídico.`,`Un incumplimiento definitivo de las obligaciones.`,`Una multa impuesta por la Contraloría.`],`El riesgo se define por su naturaleza futura e incierta que altera el equilibrio pactado.`],
+[`¿Cuáles son los tres pasos esenciales al estructurar la “matriz de riesgos”?`,`Tipificar el evento, estimar probabilidad/impacto y asignarlo a quien corresponda.`,[`Aprobar, pagar y liquidar el riesgo.`,`Asumir, demandar y archivar el riesgo.`,`Sancionar, caducar y multar el riesgo.`],`La matriz no solo enlista riesgos. Exige tipificarlos, estimarlos y asignar quién los asume y mitiga.`],
+[`Si la entidad elaboró estudios previos y no incluyó en la matriz un riesgo geológico evidente. ¿Esto hace que el riesgo sea “imprevisible”?`,`No. Que no se haya previsto no significa que fuera jurídicamente imprevisible.`,[`Sí, porque lo que no está en la matriz es imprevisible.`,`Sí, y otorga derecho automático a la imprevisión.`,`No, pero obliga a aplicar el Ius Variandi.`],`“No previsto ≠ imprevisible”. Si mapas y antecedentes advertían el riesgo, era previsible, así la entidad lo omitiera.`],
+[`Los cambios normativos, de tarifas, o decisiones de autoridades regulatorias, ¿a qué categoría de riesgo pertenecen?`,`Riesgo regulatorio (que es un riesgo exógeno).`,[`Riesgo de la naturaleza.`,`Riesgo directo de ejecución.`,`Riesgo tecnológico.`],`Decisiones de regulación económica o de mercado constituyen riesgos regulatorios exógenos al contrato.`],
+[`La obsolescencia prematura de los equipos adquiridos por el Estado en un contrato, ¿a qué categoría de riesgo pertenece?`,`Riesgo tecnológico.`,[`Riesgo regulatorio.`,`Riesgo ambiental.`,`Riesgo social o político.`],`Fallas, cambios o envejecimiento rápido de software/hardware son riesgos tecnológicos.`],
+[`¿En qué fase y en qué documento se deben identificar, analizar y asignar obligatoriamente los riesgos previsibles?`,`En la etapa precontractual, dentro de los estudios y documentos previos.`,[`En la etapa contractual, dentro del acta de inicio.`,`En la etapa postcontractual, durante la liquidación.`,`En el RUP.`],`La matriz de riesgos es un elemento esencial de los estudios previos para estructurar el proceso.`],
+[`¿A quién le corresponde asumir los riesgos denominados “Riesgos Directos” (ej. calidad defectuosa)?`,`Al contratista, quien los mitiga otorgando garantías (pólizas).`,[`A la Entidad Estatal exclusivamente.`,`Al supervisor del contrato.`,`Al juez contencioso administrativo.`],`Los riesgos desprendidos de la propia ejecución son responsabilidad del contratista.`],
+[`¿Qué documento normativo se utiliza frecuentemente en Colombia como guía para tipificar y asignar riesgos previsibles?`,`El documento CONPES 3714 de 2011.`,[`El Decreto 092 de 2017.`,`La Ley 996 de garantías electorales.`,`La Ley 1474 del Estatuto Anticorrupción.`],`El CONPES 3714 es el lineamiento clásico sobre riesgos previsibles.`],
+[`Un sismo ocurre durante una obra. ¿El solo hecho de ser un fenómeno natural lo convierte en un “riesgo imprevisible”?`,`No. Debe analizarse si era extraordinario e imprevisible según estudios y antecedentes sísmicos del lugar.`,[`Sí, porque la naturaleza es una fuerza exógena insuperable.`,`Sí, todo evento natural aplica para el Hecho del Príncipe.`,`No, todos los eventos naturales deben ser asumidos por el Estado.`],`El carácter natural no basta. Si ocurre en una zona donde tiembla a diario, era previsible.`],
+[`Si un riesgo verdaderamente extraordinario, sobreviniente y genuinamente ajeno a las partes se materializa. ¿A qué figura se acude?`,`A la Teoría de la Imprevisión.`,[`A la Acción In Rem Verso.`,`Al cierre administrativo.`,`Al principio de anualidad presupuestal.`],`La Imprevisión protege el equilibrio cuando ocurren hechos verdaderamente indetectables en la planeación.`]
+]);
+// ARRAY 2: CASUÍSTICO (30)
+const CASUISTICO=mk([
+[`Un alcalde ordena verbalmente pavimentar una calle extra. El contratista obedece y pide pago. ¿Qué aplica?`,`Hecho cumplido, procede Acción In Rem Verso.`,[`Modificación Unilateral del art. 14.`,`Adición válida por Ius Variandi.`,`Pago anticipado.`],`Obligación sin contrato escrito previo es “hecho cumplido” irregular. Se recupera vía enriquecimiento sin causa.`],
+[`Vence el plazo del contrato. Las partes no logran liquidar de mutuo acuerdo tras los 4 meses supletorios. ¿Qué sigue?`,`La entidad tiene 2 meses para liquidación unilateral por acto administrativo.`,[`Liquidación Judicial automática.`,`El contratista liquida unilateralmente.`,`Caducidad del contrato.`],`Plazos preclusivos: vencen los 4 meses de mutuo acuerdo, se activan los 2 meses para que la entidad lo haga.`],
+[`El gobierno emite un decreto general imprevisto que altera gravemente la economía de una concesión. ¿Qué teoría aplica?`,`Teoría del Hecho del Príncipe.`,[`Teoría de la Imprevisión.`,`Ius Variandi.`,`Caducidad.`],`Hecho del Príncipe: Actuación del Estado (general/abstracta) que impacta el contrato. Imprevisión es para hechos externos (naturaleza).`],
+[`Se contrata a una ESAL directamente. Para no requerir pluralidad, ¿qué exige el Decreto 092?`,`Que la ESAL aporte mínimo un 30% del valor.`,[`Que la ESAL garantice el 100% del anticipo.`,`Que aporte el 50%.`,`Que sea por mínima cuantía.`],`Los convenios de asociación con ESAL sin competencia exigen que la entidad privada aporte mínimo el 30%.`],
+[`Al firmar la liquidación, el contratista escribe: “Me reservo todos mis derechos”. Luego demanda. ¿Qué resuelve el juez?`,`Desestima. Las salvedades deben ser concretas y específicas.`,[`Admite por derecho a la justicia.`,`Anula el acta por vicio.`,`Obliga a reliquidar.`],`Las reservas genéricas no son válidas. Deben delimitar los asuntos exactos a demandar.`],
+[`Lluvia destruye obra. Contratista pide Imprevisión, pero mapas del IDEAM advertían la inundación constante.`,`No procede imprevisión porque era un riesgo previsible según estudios, debió asignarse.`,[`Procede por ser fuerza mayor natural.`,`Procede Hecho del Príncipe.`,`Procede Hecho Cumplido.`],`Que sea de la naturaleza no lo hace “imprevisible”. Si había estudios, era previsible.`],
+[`Empresa A (30%) y Empresa B (70%) en Unión Temporal incumplen por culpa de B. ¿Cómo se multa?`,`La sanción se divide según la participación y obligaciones de cada uno.`,[`Solidaridad total del 100%.`,`Caducidad solo a B.`,`Se cobra solo a la aseguradora.`],`En la Unión Temporal las sanciones se aplican según la participación, a diferencia del consorcio.`],
+[`Entidad requiere comprar 50 computadores estándar de características uniformes. Modalidad a usar:`,`Selección Abreviada (Subasta Inversa).`,[`Licitación Pública.`,`Mínima Cuantía.`,`Concurso de Méritos.`],`Bienes de características técnicas uniformes y de común utilización van por Selección Abreviada.`],
+[`Obra compleja, la entidad no tiene personal experto para vigilar. ¿Qué debe hacer?`,`Contratar una Interventoría (tercero especializado).`,[`Designar a un Supervisor interno.`,`No vigilar, exigir mejor póliza.`,`Hacer un convenio solidario.`],`La supervisión es interna. La interventoría se contrata cuando se exigen conocimientos muy técnicos.`],
+[`Modificación unilateral del contrato altera el valor inicial en un 25%.`,`El contratista tiene derecho a renunciar a la ejecución.`,[`Debe asumir la carga por principio de anualidad.`,`Se declara caducidad.`,`Procede In Rem Verso.`],`Si la modificación unilateral altera el valor en más del 20%, la ley permite al contratista renunciar.`],
+[`Supervisor autoriza pago con solo 1 foto de asistentes. Contraloría descubre faltantes.`,`Responde disciplinaria y fiscalmente; la evidencia no fue idónea ni proporcional.`,[`No responde, la foto sanea el pago.`,`Responde solo el contratista.`,`Es un riesgo exógeno.`],`La responsabilidad exige verificar cumplimientos con evidencias suficientes, no superficiales.`],
+[`Pasan 4 meses de mutuo acuerdo y 2 meses de liquidación unilateral sin acción estatal. Pasa 1 año más. Contratista demanda.`,`Procede liquidación judicial, está dentro de los 2 años de caducidad.`,[`La entidad aún puede liquidar unilateral.`,`Ya caducó, eran 6 meses.`,`Procede Hecho Cumplido.`],`Vencidos los 6 meses, procede la liquidación judicial vía contenciosa, cuya caducidad es de 2 años.`],
+[`Se declara terremoto inminente y se necesita comprar carpas en 1 hora.`,`Contratación Directa por Urgencia Manifiesta.`,[`Selección Abreviada por Subasta.`,`Licitación con plazos cortos.`,`Mínima cuantía.`],`La urgencia manifiesta es causal expresa de Contratación Directa.`],
+[`Pliego de consultoría exige alto “K residual”. Oferente impugna.`,`Oferente tiene razón, el K residual es solo para contratos de OBRA.`,[`El pliego es válido, evalúa liquidez.`,`Es válido por ser concurso de méritos.`,`Es ilegal, debió pedir RUP especial.`],`El K residual evalúa capacidad operativa para nuevas OBRAS, no aplica en consultoría.`],
+[`Se contrata prestación de servicios pero no se hacen estudios previos por ser “Directa”.`,`Ilegal. La modalidad flexibiliza, pero no exime de hacer estudios previos.`,[`Legal por urgencia administrativa.`,`Legal porque no hay pliego.`,`Depende del presupuesto.`],`Toda contratación exige planeación y estudios previos (necesidad, valor).`],
+[`Contratista pide “anticipo del 20%” en prestación de servicios profesionales.`,`Ilegal. La ley prohíbe anticipos en prestación de servicios.`,[`Legal, 20% es el máximo.`,`Legal si aporta garantías.`,`Legal si es pago anticipado.`],`El anticipo está prohibido por norma expresa en los contratos de prestación de servicios.`],
+[`Termina concesión de 20 años. Contratista se lleva grúas porque no pactaron cláusula de reversión.`,`Ilegal. La reversión es de la esencia, se entiende incluida así no se escriba.`,[`Legal, primó propiedad privada.`,`Deben liquidar por in rem verso.`,`Solo puede llevarse el 50%.`],`En concesiones, los bienes destinados al servicio revierten automáticamente al Estado.`],
+[`Entidad rechaza “Promesa de Sociedad Futura” por falta de personería jurídica actual.`,`Rechazo ilegal. La figura es válida obligándose a constituirse si ganan.`,[`Rechazo válido, solo sirven Consorcios.`,`Rechazo válido por falta de K residual.`,`Es legal rechazar si son ESAL.`],`Acreditan capacidad prometiendo nacer jurídicamente si son adjudicatarios.`],
+[`Contrato liquidado a paz y salvo. Equipos tienen garantía de 3 años. ¿Cuándo expide el Cierre del Expediente?`,`En 3 años, al expirar garantías y acreditar disposición final.`,[`Inmediatamente con el acta.`,`En 4 meses supletorios.`,`Cuando la contraloría lo pida.`],`El cierre es un acto netamente posterior a la liquidación, supeditado a las garantías.`],
+[`Consorcio de 3 empresas incumple. Una quiebra. ¿A quién se le cobra la multa?`,`A las otras 2 por el 100%. En el consorcio hay solidaridad total.`,[`Se cobra solo el 33% a cada una.`,`Se perdona la parte quebrada.`,`Se declara hecho cumplido.`],`Todos responden solidariamente. Si uno no puede, los demás responden por todo.`],
+[`Acta de recibo final firmada a satisfacción. Contratista dice que ya no hay que liquidar.`,`Falso. El acta de recibo no sustituye a la liquidación; saldos deben ir en la liquidación.`,[`Verdadero, sanea la liquidación.`,`Depende del monto del anticipo.`,`Verdadero, si pasaron 4 meses.`],`El recibo acredita entrega; la liquidación cruza las cuentas.`],
+[`Entidad sanciona con Caducidad por incumplimiento leve de una entrega.`,`Ilegal. La caducidad exige incumplimiento que paralice o afecte gravemente el servicio.`,[`Legal, ius variandi lo permite.`,`Legal si superó 20% del valor.`,`Depende del supervisor.`],`La caducidad es la sanción más extrema y no procede por faltas leves.`],
+[`La JAL (Junta Administradora Local) pide al alcalde celebrar un Convenio Solidario.`,`Ilegal. Los convenios solidarios se hacen con la JAC (Acción Comunal).`,[`Legal por ser ente territorial.`,`Legal si aportan el 30%.`,`Solo procede por licitación.`],`La JAL es política; la JAC es comunal. La norma autoriza a los de acción comunal.`],
+[`Entidad va a comprar jabones en una Gran Superficie (Almacén de cadena).`,`Procede por Mínima Cuantía (dependiendo del valor).`,[`Contratación Directa obligatoria.`,`Concurso de méritos.`,`Siempre Licitación Pública.`],`La compra en grandes superficies suele regularse por Mínima cuantía.`],
+[`Alcalde hace Prestación de Servicios para un cargo de planta permanente.`,`Irregular. La prestación es transitoria (apoyo o especialidad técnica).`,[`Legal, es contratación directa.`,`Legal por Ius Variandi.`,`Solo ilegal si dura 2 años.`],`No puede encubrir relaciones laborales permanentes.`],
+[`Interventor asume funciones jurídicas sin que el contrato lo especificara, solo por ser interventor.`,`Irregular. La interventoría es técnica; áreas jurídicas deben justificarse y pactarse.`,[`Legal, asume todo por ley.`,`Legal, si el supervisor se ausenta.`,`Solo en licitaciones.`],`La supervisión es integral, pero la interventoría es por naturaleza técnica.`],
+[`Pasan 3 años desde terminación. Nunca se liquidó. Contratista demanda para liquidación judicial.`,`Juez rechaza por caducidad (el medio de control caduca a los 2 años).`,[`Juez admite porque es imprescriptible.`,`Juez ordena liquidación unilateral.`,`Pasa a Contraloría.`],`La vía judicial para liquidar está atada al medio de control de controversias contractuales (2 años).`],
+[`Se liquidan saldos a favor del contratista en acta bilateral, pero la entidad no paga 6 meses después.`,`Puede cobrar por proceso ejecutivo, pues el acta presta mérito ejecutivo.`,[`Debe demandar por In Rem Verso.`,`Pedir Hecho del Príncipe.`,`Aplicar caducidad.`],`El acta consolida obligaciones claras, expresas y exigibles.`],
+[`Contratista pide Imprevisión porque la inflación predecible aumentó costo del cemento.`,`No procede. La imprevisión exige hecho extraordinario. La inflación es riesgo económico propio.`,[`Procede si afecta más del 50%.`,`Procede por Hecho del Príncipe.`,`Procede vía Ius Variandi.`],`Variaciones macroeconómicas normales no rompen la ecuación bajo imprevisión.`],
+[`Entidad exige los mismos requisitos habilitantes de Licitación en una Contratación Directa.`,`No es obligatorio. En contratación directa, los habilitantes se simplifican.`,[`Legal, toda modalidad exige K residual.`,`Es nulo porque no hay pliego.`,`Obliga a pedir autorización al juez.`],`La contratación directa flexibiliza los requisitos habilitantes para agilidad.`]
+]);
+
+const $=id=>document.getElementById(id),show=id=>["home","game","end"].forEach(s=>$(s).hidden=s!==id);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+let mode,pool,total,score,done,cur,pts=0,streak=0,maxS=0,answered=false,missed=[],saved={T:null,C:null},snd=true,AC;
+const TOP=[["Liquidación y cierre",/liquidaci|cierre|recibo final/i],["Riesgos e imprevisión",/riesgo|imprevis|matriz|CONPES/i],["Hecho del Príncipe, Ius Variandi y hecho cumplido",/pr[ií]ncipe|variandi|hecho cumplido|in rem verso|adici/i],["Anticipos y pagos",/anticipo|pago/i],["Modalidades de selección",/licitaci|abreviada|m[ií]nima|m[eé]ritos|directa|subasta|urgencia/i],["Consorcio, Unión Temporal y ESAL",/consorcio|uni[oó]n temporal|ESAL|JAC|JAL|solidari|promesa/i],["Supervisión e interventoría",/supervis|interventor/i],["Concesión y reversión",/concesi|reversi/i],["Habilitantes, RUP y K residual",/RUP|K residual|habilitante|capacidad|pliego/i]];
+function beep(f,d,t=0){if(!snd)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+t);o.stop(AC.currentTime+t+d)}catch(e){}}
+function burst(n,em){for(let i=0;i<n;i++){const s=document.createElement("span");s.className="pc";s.textContent=em[Math.random()*em.length|0];s.style.left=(15+Math.random()*70)+"vw";s.style.setProperty("--dx",(Math.random()*240-120)+"px");s.style.animationDuration=(.8+Math.random()*.8)+"s";document.body.appendChild(s);setTimeout(()=>s.remove(),1700)}}
+function fx(g){if(g){beep(660,.1);beep(880,.15,.1);burst(streak>=3?28:12,streak>=3?["🔥","⭐","✨","🎉"]:["⭐","✨"]);const p=$("pts");p.classList.remove("pp");void p.offsetWidth;p.classList.add("pp")}else{beep(180,.3);navigator.vibrate&&navigator.vibrate(120)}}
+const lbl=(m,a,t)=>{const s=saved[m];$("r"+m).hidden=!s;return s?`▶ Continuar · ${s.done}/${s.total} · ⭐ ${s.pts}`:a.length+t};
+function back(){if(!answered&&cur)pool.push(cur);if(done>=total)return finish();saved[mode]={pool,total,score,done,pts,streak,maxS,missed};menu()}
+function improve(){const box=$("improve");box.innerHTML="";$("redo").hidden=!missed.length;
+ if(!missed.length){box.innerHTML="<div class='card'><h3>🎯 En qué mejorar</h3>¡Cero errores! Mantén el ritmo y prueba el otro modo.</div>";return}
+ const c={};missed.forEach(q=>{const t=(TOP.find(([n,r])=>r.test(q.pregunta+" "+q.explicacion))||["Conceptos generales"])[0];c[t]=(c[t]||0)+1});
+ const card=document.createElement("div");card.className="card";
+ card.innerHTML="<h3>🎯 En qué debes mejorar</h3>"+Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`<div>• <b>${t}</b>: ${n} fallo${n>1?"s":""}</div>`).join("");
+ const d=document.createElement("details");d.innerHTML="<summary>Ver mis errores con la respuesta correcta</summary>";
+ missed.forEach(q=>{const p=document.createElement("p");p.innerHTML="<b></b><br>✅ <span></span>";p.children[0].textContent=q.pregunta;p.querySelector("span").textContent=q.correcta;d.appendChild(p)});
+ card.appendChild(d);box.appendChild(card)}
+const OKS=["¡Eso es criterio de abogado!","¡Así se hace, sigue así!","¡Excelente, el profe aprueba!","¡Brillante! Cada acierto te acerca al examen.","¡Gran lectura del caso!","¡Muy bien! Estás afinando el ojo.","¡Imparable! Tu cerebro está en modo cuchilla.","¡Perfecto! Esa no se te escapó."];
+const BADS=["Tranquilo: equivocarse hoy es acertar mañana en el examen.","No pasa nada. Lee la explicación y esta ya es tuya.","El error es parte del aprendizaje. ¡Vas bien, sigue!","Casi. Los mejores abogados también cayeron en esta trampa.","Respira. Una pregunta no define tu nivel, la constancia sí.","Esta era difícil. Ahora ya sabes cómo se la ponen al estudiante.","¡Ánimo! Cada fallo bien repasado vale doble."];
+const rnd=a=>a[Math.random()*a.length|0];
+const hud=()=>{$("pts").textContent=`⭐ ${pts} · ✔ ${score}`;$("streak").textContent=streak>1?`🔥 x${streak}`:""};
+function menu(){show("home");
+ $("nT").textContent=lbl("T",TEORICO," preguntas de concepto");
+ $("nC").textContent=lbl("C",CASUISTICO," casos prácticos de nivel avanzado");
+ $("mT").disabled=!TEORICO.length;$("mC").disabled=!CASUISTICO.length}
+function start(m,list,fresh){mode=m;const s=saved[m];if(s&&!list&&!fresh){({pool,total,score,done,pts,streak,maxS,missed}=s);saved[m]=null;show("game");return ask()}
+ saved[m]=null;pool=(list||(m==="T"?TEORICO:CASUISTICO)).slice();total=pool.length;score=0;done=0;pts=0;streak=0;maxS=0;missed=[];show("game");ask()}
+function ask(){
+ if(!pool.length)return finish();
+ cur=pool.splice(Math.random()*pool.length|0,1)[0];answered=false;for(const e of [$("q"),$("opts")]){e.classList.remove("in");void e.offsetWidth;e.classList.add("in")}
+ $("fb").hidden=true;
+ $("count").textContent=`Pregunta ${done+1} de ${total}`;hud();
+ $("fill").style.width=done/total*100+"%";$("q").textContent=cur.pregunta;
+ const box=$("opts");box.innerHTML="";
+ shuffle([{t:cur.correcta,ok:1},...cur.incorrectas.map(t=>({t,ok:0}))]).forEach(o=>{
+  const b=document.createElement("button");b.className="opt";b.textContent=o.t;b.dataset.ok=o.ok;b.onclick=()=>pick(b);box.appendChild(b)});
+ window.scrollTo({top:0,behavior:"smooth"})}
+function pick(b){
+ const all=[...document.querySelectorAll(".opt")];all.forEach(x=>x.disabled=true);
+ const good=b.dataset.ok==="1";
+ let gain=0;if(good){score++;streak++;maxS=Math.max(maxS,streak);gain=100+(Math.min(streak,6)-1)*25;pts+=gain;b.classList.add("ok")}else{streak=0;b.classList.add("bad");all.find(x=>x.dataset.ok==="1").classList.add("ok")}
+ $("msg").className="msg "+(good?"ok":"bad");$("msg").textContent=good?`${streak>=3?"🔥 Racha de "+streak+". ":""}${rnd(OKS)}  +${gain} pts`:rnd(BADS);
+ all.forEach(x=>{if(!/ok|bad/.test(x.className))x.classList.add("dim")});
+ document.body.classList.add(good?"fok":"fbad");setTimeout(()=>document.body.classList.remove("fok","fbad"),500);
+ answered=true;if(!good)missed.push(cur);fx(good);done++;$("fill").style.width=done/total*100+"%";hud();
+ $("exp").textContent=cur.explicacion;$("next").textContent=pool.length?"Continuar":"Ver resultados";
+ $("fb").hidden=false;$("fb").scrollIntoView({behavior:"smooth",block:"nearest"})}
+function finish(){show("end");const p=Math.round(score/total*100);
+ $("final").textContent=`⭐ ${pts}`;improve();
+ const rk=p>=90?["🏆","Magistrado"]:p>=70?["🥇","Procurador"]:p>=50?["🥈","Abogado litigante"]:["🥉","Pasante en ascenso"];
+ $("rank").textContent=`${rk[0]} ${rk[1]}`;
+ let rec=0;try{rec=+localStorage.getItem("l80"+mode)||0;if(pts>rec){localStorage.setItem("l80"+mode,pts);rec=-1}}catch(e){}
+ $("stats").textContent=`${score}/${total} aciertos · ${p}% · mejor racha 🔥 ${maxS}`+(rec===-1?" · ¡Nuevo récord! 🎉":rec?` · Récord ${rec}`:"");
+ $("verdict").textContent=p>=90?"¡Nivel cuchilla! Pasarías con el profe. Felicitaciones.":p>=70?"¡Muy buen nivel! Repasa las trampas que fallaste y llegas al top.":p>=50?"Vas a medio camino y avanzando. Otra ronda y afinas el criterio.":"No te desanimes: todos empezamos así. Repite el modo, cada ronda sube tu puntaje."}
+$("mT").onclick=()=>start("T");$("mC").onclick=()=>start("C");$("rT").onclick=()=>start("T",null,true);$("rC").onclick=()=>start("C",null,true);$("back").onclick=back;$("redo").onclick=()=>start(mode,missed.slice());$("snd").onclick=()=>{snd=!snd;$("snd").textContent=snd?"🔊":"🔇"};
+$("next").onclick=ask;$("again").onclick=()=>start(mode);$("menu").onclick=menu;
+menu();
+</script></body></html>
